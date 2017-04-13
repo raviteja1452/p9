@@ -1,12 +1,12 @@
 //p9scripts
 /*
-Question: Creation of Queue using Circular Array
+Question: Creation of Queue using Dynamic Circular Array
 
 Algorithm : Queue is an Abstract Data Type. 
 Implementation of Queue is nothing but implementation of the operations of it.
 Such as Enqueue, Dequeue, Front, isEmpty, Size:
 
-Here we are using a Circular array of fixed size of the same. 
+Here we are using a Circular array which double incremental strategy.
 
 */
 
@@ -16,14 +16,32 @@ using namespace std;
 class Queue{
 	private:
 		// Circular Array of size 5
-		int arr[5];
+		int *arr,*dummy;
 		int front,rear,max;
+		// Doubling the stack by twice
+		int doubleQueue(){
+			dummy = arr;
+			arr = new int[max*2];
+			int max2 = max*2;
+			int i = front;
+			while(i%max!=rear){
+				arr[i%max2] = dummy[i%max];
+				i = i+1;
+			}
+			arr[i%max2] = dummy[rear];
+			rear = i%max2;
+			max = max2;
+			cout << "Queue is resized to " << max << endl;
+			delete [] dummy;
+			return 1;
+		}
 
 	public:
 		Queue(void){
 			// Maximum Size of Queue
 			cout << "Initialized the Queue" << endl;
-			max = sizeof(arr)/sizeof(int);
+			arr = new int [1];
+			max = 1;
 			// When queue is empty, front and rear are set to -1
 			front = -1;
 			rear = -1;
@@ -33,15 +51,13 @@ class Queue{
 		int enqueue(int val){
 			// Using modulus as we are using a circular array.
 			if ((rear+1)%max == front){
-				cout << "Queue is Full, Overflow" <<endl;
-				return -1;
-			}else{
-				rear = (rear + 1)%max;
-				arr[rear] = val;
-				cout << "enqueing :" << arr[rear] << endl;
-				if(front == -1){
-					front = (front + 1)%max;
-				}
+				doubleQueue();
+			}
+			rear = (rear + 1)%max;
+			arr[rear] = val;
+			cout << "enqueing :" << arr[rear] << endl;
+			if(front == -1){
+				front = (front + 1)%max;
 			}
 			return 0;
 		}
@@ -111,7 +127,7 @@ class Queue{
 				cout << "Elements of Queue are" << endl;
 				int i = front;
 				while(i != rear){
-					cout << arr[i] ;
+					cout << arr[i] << " ";
 					i = (i + 1)%max;
 				}
 				cout << arr[rear] << endl;
@@ -127,13 +143,19 @@ int main(void){
 	qe.dequeue();
 	qe.enqueue(10);
 	qe.enqueue(11);
+	qe.display();
 	qe.size();
 	qe.enqueue(20);
+	qe.display();
 	qe.enqueue(30);
+	qe.display();
 	qe.enqueue(40);
+	qe.display();
 	qe.enqueue(50);
 	qe.enqueue(60);
+	qe.display();
 	qe.enqueue(70);
+	qe.display();
 	qe.dequeue();
 	qe.size();
 	qe.Front();
@@ -141,5 +163,15 @@ int main(void){
 	qe.size();
 	qe.Front();
 	qe.enqueue(80);
+	qe.display();
 	return 1;
 }
+
+
+// Complexities
+
+// For Doubling Strategy.
+// Time Complexity to push an element is o(1)
+// Time Complexity to pop an element is o(1)
+// Time Complexity to Delete complete Queue is o(1)
+// Time Complexity to get size is o(1)
